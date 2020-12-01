@@ -71,6 +71,10 @@ app.post('/searches', (req, res) => {
                 
             });
             res.render('pages/searches/show', { bookData: books })
+
+        })
+        .catch(error => {
+            res.render('pages/error');
         })
         
 });
