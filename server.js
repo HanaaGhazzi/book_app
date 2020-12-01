@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 app.get('/index', (req, res) => {
     let SQL = 'SELECT * FROM books;';
-    return client.query(SQL)
+  client.query(SQL)
         .then(results => {
             res.render('pages/index', { books: results.rows });
         })
@@ -32,12 +32,12 @@ app.get('/search', (req, res) => {
     res.render('./pages/searches/new')
 })
 
-app.get('books/:id', (req, res) => {
-    let SQL = `SELECT *FROM books WHERE id =$1;`
+app.get('/books/:id', (req, res) => {
+    let SQL = `SELECT * FROM books WHERE id =$1;`
     let values = [req.params.id];
-    return client.query(SQL, values)
+    client.query(SQL, values)
         .then((results) => {
-            res.render('./pages/books/show', { books: results.rows[0] })
+            res.render('pages/books/show', { books: results.rows[0] })
         })
 })
 
@@ -48,13 +48,14 @@ app.post('/books', (req, res)=> {
     
     client.query(SQL, safeValues)
     .then((results) => {
-        res.redirect(`./pages/books/${results.rows[0].id}`)
+        res.redirect(`/books/${results.rows[0].id}`)
     })
     
 });
 
 
 app.post('/searches', (req, res) => {
+    
     var url;
     let bookSearch = req.body.bookname;
 
@@ -81,7 +82,7 @@ app.post('/searches', (req, res) => {
 
 function Book(book) {
     this.title = book.volumeInfo.title;
-    this.image = book.volumeInfo.imageLinks.smallThumbnail ? book.volumeInfo.imageLinks.smallThumbnail : `https://i.imgur.com/J5LVHEL.jpg`;
+    this.image = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.smallThumbnail : `https://i.imgur.com/J5LVHEL.jpg`;
     this.authors = book.volumeInfo.authors ? book.volumeInfo.authors[0] : 'Not avilabile';
     this.description = book.volumeInfo.description ? book.volumeInfo.description : 'Not avilabile';
     this.isbn = book.volumeInfo.industryIdentifiers[0].type;
