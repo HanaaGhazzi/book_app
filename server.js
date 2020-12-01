@@ -5,10 +5,11 @@ const express = require('express');
 const PORT = process.env.PORT || 3030;
 const app = express();
 const pg = require('pg');
+const methodOverride = require('method-override');
 const superagent = require('superagent');
 const client = new pg.Client(process.env.DATABASE_URL)
 app.use(express.static('./public'));
-
+app.use(methodOverride('_method'));
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -49,6 +50,28 @@ app.post('/books', (req, res)=> {
     })
     
 });
+ 
+app.put('/updateBooks/:id', (req,res) =>{
+
+    let { title, author, isbn, image_url, description } = req.body;   
+    let SQL = `UPDATE books SET title=$1,author=$2,isbn=$3,image_url=$4,description=$5 WHERE id=$6;`
+    let safeValues = [title, author, isbn, image_url, description,req.params.id];
+    
+    client.query(SQL,safeValues)
+    .then(()=>{
+        res.redirect(`/books/${req.params.id}`)
+    })
+})
+
+app.delete('/deleteBook/:id', (req,res) =>{
+    let SQL = `DELETE FROM books WHERE id=$1;`
+    let values =[req.params.id]
+
+    client.query(SQL, values)
+    .then(()=>{
+        res.redirect(('/'))
+    })
+})
 
 
 app.post('/searches', (req, res) => {
